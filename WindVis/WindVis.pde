@@ -6,7 +6,7 @@
 Table uwnd;
 
 // vwnd stores the 'v' component of the wind, which measures the
-// north-south component of the wind.  Positive values indicate
+// north-south component of the wind. Positive values indicate
 // northward wind, and negative values indicate southward wind.
 Table vwnd;
 
@@ -53,10 +53,39 @@ void drawMouseLine() {
 // Reads a bilinearly-interpolated value at the given a and b
 // coordinates.  Both a and b should be in data coordinates.
 float readInterp(Table tab, float a, float b) {
-  int x = int(a);
-  int y = int(b);
+  //int x = int(a);
+  //int y = int(b);
+  
+  float xy = 0;
+  
   // TODO: do bilinear interpolation
-  return readRaw(tab, x, y);
+  if (a < 0) {
+    a = 0;
+  }
+  if(a >= tab.getColumnCount()) {
+    a = tab.getColumnCount() - 1;
+  }
+  if (b < 0) {
+    b = 0;
+  }
+  if(b >= tab.getRowCount()){
+    b = tab.getRowCount() - 1;
+  }
+  
+  for(int u = 0; u < tab.getColumnCount(); u++) {
+    for(int v = 0; v < tab.getRowCount(); v++) {
+      if ((a > u) && (a < u+1) && (b < v) && ( b < v+1)) {
+        float x1 = (((u+1)-(a))/((u+1)-(u))*(tab.getFloat((int)v+1,(int)u)))+(((a-u)/((u+1)-(u)))*(tab.getFloat((int)v+1,(int)u+1)));
+        float x2 = (((u+1)-(a))/((u+1)-(u))*(tab.getFloat((int)v,(int)u)))+(((a-u)/((u+1)-(u)))*(tab.getFloat((int)v,(int)u+1)));
+        xy = (((v-b)/v-(v+1))*x1) + (((b-(v+1))/(v-(v+1)))*x2);
+    }
+    }
+    println(xy);
+  }
+  
+  
+  
+  return xy;
 }
 
 // Reads a raw value 
