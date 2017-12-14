@@ -56,8 +56,6 @@ float readInterp(Table tab, float a, float b) {
   //int x = int(a);
   //int y = int(b);
   
-  float xy = 0;
-  
   // TODO: do bilinear interpolation
   if (a < 0) {
     a = 0;
@@ -71,20 +69,14 @@ float readInterp(Table tab, float a, float b) {
   if(b >= tab.getRowCount()){
     b = tab.getRowCount() - 1;
   }
-  
-  for(int u = 0; u < tab.getColumnCount(); u++) {
-    for(int v = 0; v < tab.getRowCount(); v++) {
-      if ((a > u) && (a < u+1) && (b < v) && ( b < v+1)) {
-        float x1 = (((u+1)-(a))/((u+1)-(u))*(tab.getFloat((int)v+1,(int)u)))+(((a-u)/((u+1)-(u)))*(tab.getFloat((int)v+1,(int)u+1)));
-        float x2 = (((u+1)-(a))/((u+1)-(u))*(tab.getFloat((int)v,(int)u)))+(((a-u)/((u+1)-(u)))*(tab.getFloat((int)v,(int)u+1)));
-        xy = (((v-b)/v-(v+1))*x1) + (((b-(v+1))/(v-(v+1)))*x2);
-    }
-    }
-    println(xy);
-  }
-  
-  
-  
+  float x1 = (float) Math.floor(700-a)-1;
+  float x2 = x1 + 1;
+  float y2 = (float) Math.floor(400-b);
+  float y1 = y2 + 1;
+  float firstX = (x1-a+1)*(tab.getFloat((int)y1+1,(int)x1))+(a-x1)*(tab.getFloat((int)y2+1,(int)x1+1));
+  float secondX = (x1-a+1)*(tab.getFloat((int)y2,(int)x1))+(a-x1)*(tab.getFloat((int)y2,(int)x1+1));
+  float xy = (y2-b)*firstX + (b-y2+1)*secondX;
+  println(xy);
   return xy;
 }
 
