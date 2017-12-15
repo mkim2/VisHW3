@@ -99,35 +99,35 @@
    return P;
   }
 
-  //void drawParticle(float x, float y, int lifeCycle, Table tab) {
+  void drawParticle(float x, float y, int lifeCycle, Table tab) {
 
-  //float stepSize = 0.1;
-  //float newX;
-  //float newY;
-  //  float age = 1;
+  float stepSize = 0.1;
+  float newX;
+  float newY;
+    float age = 1;
 
-  //  stroke(255, 20, 147);
-  //  if(age < lifeCycle) {
-  //  beginShape(POINTS);
-  //  strokeWeight(4);
-  //  vertex(x,y);
+    stroke(255, 20, 147);
+    if(age < lifeCycle) {
+    beginShape(POINTS);
+    strokeWeight(4);
+    vertex(x,y);
       
-  //  //Runge Kutta
-  //  float k1 = stepSize * readInterp(tab, x, y);
-  //  float k2 = stepSize * readInterp(tab, x + (1/2*k1), y + (1/2*stepSize));
-  //  float k3 = stepSize * readInterp(tab, x + (1/2*k2), y + (1/2*stepSize));
-  //  float k4 = stepSize * readInterp(tab, x + k3, y + stepSize);
-  //  newY = y + (1/6)*k1 + (1/3)*k2 + (1/3)*k3 + (1/6)*k4;
-  //  newX = x + stepSize;
-  //  globalX = newX;
-  //  globalY = newY;
-  //  age++;
-  //  if (age == lifeCycle-1) {
-  //    age = 1;
-  //  }
-  //  endShape();
-  //  }
-  //}
+    //Runge Kutta
+    float k1 = stepSize * readInterp(tab, x, y);
+    float k2 = stepSize * readInterp(tab, x + (1/2*k1), y + (1/2*stepSize));
+    float k3 = stepSize * readInterp(tab, x + (1/2*k2), y + (1/2*stepSize));
+    float k4 = stepSize * readInterp(tab, x + k3, y + stepSize);
+    newY = y + (1/6)*k1 + (1/3)*k2 + (1/3)*k3 + (1/6)*k4;
+    newX = x + stepSize;
+    globalX = newX;
+    globalY = newY;
+    age++;
+    if (age == lifeCycle-1) {
+      age = 1;
+    }
+    endShape();
+    }
+  }
   
   // Reads a raw value 
   float readRaw(Table tab, int x, int y) {
