@@ -36,14 +36,21 @@ void draw() {
   
   float a = mouseX * uwnd.getColumnCount() / width;
   float b = mouseY * uwnd.getRowCount() / height;
+  strokeWeight(2);
   drawMouseLine();
-  //for (int i =0; i < 2000; i++){
-  //  beginShape(POINTS);
-  //  strokeWeight(10);
-  //  vertex(a, b);
-  //  endShape();
-    
+  //strokeWeight(10);
+  //beginShape(POINTS);
+  //vertex(100, 100);
+  //endShape();
+   for (int i =0; i < 2; i++){
+    //beginShape(POINTS);
+    strokeWeight(5);
+    drawParticle((int)random(0, 700), (int) random(0, 400), (int) random(0,200));
+    //endShape();
   }
+ 
+  }
+  
  
 //}
 
@@ -79,6 +86,27 @@ float readInterp(Table tab, float a, float b) {
    System.out.println(P);
   return P;
 }
+
+float eulerMethod(Table tab, float a, float b) {
+  float stepSize = 0.1;
+  float newY;
+  newY = b + stepSize*readInterp(tab, a, b);
+  return newY;
+}
+
+void drawParticle(int x,int y, int lt) {
+    beginShape(POINTS);
+    strokeWeight(5);
+    for (int i =0; i < lt; i++){
+    vertex(x, y);
+    
+    if(i == lt-1) {
+      i = lt;
+    }
+    
+    }
+    endShape();
+  }
 
 // Reads a raw value 
 float readRaw(Table tab, int x, int y) {
