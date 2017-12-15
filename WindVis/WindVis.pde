@@ -33,8 +33,19 @@ void setup() {
 void draw() {
   background(255);
   image(img, 0, 0, width, height);
+  
+  float a = mouseX * uwnd.getColumnCount() / width;
+  float b = mouseY * uwnd.getRowCount() / height;
   drawMouseLine();
-}
+  //for (int i =0; i < 2000; i++){
+  //  beginShape(POINTS);
+  //  strokeWeight(10);
+  //  vertex(a, b);
+  //  endShape();
+    
+  }
+ 
+//}
 
 void drawMouseLine() {
   // Convert from pixel coordinates into coordinates
