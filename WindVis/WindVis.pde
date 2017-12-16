@@ -17,10 +17,9 @@
  // map and pick out the subset that corresponds to the range from
  // 135W to 65W, and from 55N to 25N
  PImage img;
- float globalX;
- float globalY;
  
- HashMap<Integer, Particle> drawnParticles = new HashMap<Integer, Particle>();
+ ArrayList<Particle> particles = new ArrayList<Particle>();
+ 
  void setup() {
    // If this doesn't work on your computer, you can remove the 'P3D'
    // parameter.  On many computers, having P3D should make it run faster
@@ -31,28 +30,20 @@
    uwnd = loadTable("uwnd.csv");
    vwnd = loadTable("vwnd.csv");
    
+   for(int i = 0; i < 1000; i++) {
+     float randomX = random(0, width);
+     float randomY = random(0, height);
+     float randomLifeCycle = random(0, 201);
+     Particle particle = new Particle(randomX, randomY, (int) randomLifeCycle);
+     particles.add(particle);
+   }
  }
  
  void draw() {
    background(255);
    image(img, 0, 0, width, height);
-   strokeWeight(2);
    drawMouseLine();
-  
-   for(int i = 0; i <1000; i++) {
-   float randomX = random(0, 700);
-   float randomY = random(0, 400);
-   float randomLifeCycle = random (0, 200);
-   Particle particle = new Particle(randomX, randomY, (int)randomLifeCycle, vwnd);
-   drawnParticles.put(i, particle);
-   }
-   for (Integer x: drawnParticles.keySet()){
-     Particle par = drawnParticles.get(x);
-     int cycle = (int) par.lifeCycle;
-     if(par.age <= cycle) {
-       par.update(par.x, par.y, vwnd);
-     }
-   }
+   drawParticles();
  }
  
  void drawMouseLine() {
@@ -66,68 +57,72 @@
    // does.
    float dx = readInterp(uwnd, a, b) * 10;
    float dy = -readInterp(vwnd, a, b) * 10;
+   strokeWeight(2);
    line(mouseX, mouseY, mouseX + dx, mouseY + dy);
  }
  
   // Reads a bilinearly-interpolated value at the given a and b
   // coordinates.  Both a and b should be in data coordinates.
   float readInterp(Table tab, float a, float b) {
-   int x1 = (int)a;
-   int y2 = (int)b;
-   int y1 = y2 + 1;
-   int x2= x1 +1;
-   float x = a;
-   float y = b;
-    
-    // TODO: do bilinear interpolation
-   if (a < 0) {
-     a = 0;
-   }
-   if(a >= tab.getColumnCount()) {
-     a = tab.getColumnCount() - 1;
-   }
-   if (b < 0) {
-     b = 0;
-   }
-   if(b >= tab.getRowCount()){
-     b = tab.getRowCount() - 1;
-   }
-    float R1= (((x2-x)*(readRaw(tab,y1,x1)))+((x-x1)*(readRaw(tab,y1,x2))))/(x2-x1);
-    float R2 = (((x2-x)*(readRaw(tab, x1,y2)))+((x-x1)*(readRaw(tab,x2,y2))))/(x2-x1);
-    float P = (((y2-y)*R1)+((y-y1)*R2))/(y2-y1);
-    //System.out.println(P);
-   return P;
+     int x1 = (int) a;
+     int y2 = (int) b;
+     int y1 = y2 + 1;
+     int x2 = x1 + 1;
+     float x = a;
+     float y = b;
+      
+     // TODO: do bilinear interpolation
+     if (a < 0) {
+       a = 0;
+     }
+     if(a >= tab.getColumnCount()) {
+       a = tab.getColumnCount() - 1;
+     }
+     if (b < 0) {
+       b = 0;
+     }
+     if(b >= tab.getRowCount()){
+       b = tab.getRowCount() - 1;
+     }
+     float R1 = (((x2-x)*(readRaw(tab,y1,x1)))+((x-x1)*(readRaw(tab,y1,x2))))/(x2-x1);
+     float R2 = (((x2-x)*(readRaw(tab,x1,y2)))+((x-x1)*(readRaw(tab,x2,y2))))/(x2-x1);
+     float P = (((y2-y)*R1)+((y-y1)*R2))/(y2-y1);
+     return P;
   }
 
-  //void drawParticle(float x, float y, int lifeCycle, Table tab) {
+  void drawParticles() {
+    float stepSize = 0.1;
 
-  //float stepSize = 0.1;
-  //float newX;
-  //float newY;
-  //  float age = 1;
-
-  //  stroke(255, 20, 147);
-  //  if(age < lifeCycle) {
-  //  beginShape(POINTS);
-  //  strokeWeight(4);
-  //  vertex(x,y);
-      
-  //  //Runge Kutta
-  //  float k1 = stepSize * readInterp(tab, x, y);
-  //  float k2 = stepSize * readInterp(tab, x + (1/2*k1), y + (1/2*stepSize));
-  //  float k3 = stepSize * readInterp(tab, x + (1/2*k2), y + (1/2*stepSize));
-  //  float k4 = stepSize * readInterp(tab, x + k3, y + stepSize);
-  //  newY = y + (1/6)*k1 + (1/3)*k2 + (1/3)*k3 + (1/6)*k4;
-  //  newX = x + stepSize;
-  //  globalX = newX;
-  //  globalY = newY;
-  //  age++;
-  //  if (age == lifeCycle-1) {
-  //    age = 1;
-  //  }
-  //  endShape();
-  //  }
-  //}
+    stroke(255, 20, 147);
+    beginShape(POINTS);
+    strokeWeight(4);
+    
+    for(int i = 0; i < particles.size(); i++) {
+      Particle p = particles.get(i);
+      if(p.age < p.lifeCycle) {
+        //Runge Kutta
+        float yk1 = -1 * stepSize * readInterp(vwnd, p.x, p.y);
+        float yk2 = -1 * stepSize * readInterp(vwnd, p.x + (1/2*stepSize), p.y + (1/2*yk1));
+        float yk3 = -1 * stepSize * readInterp(vwnd, p.x + (1/2*stepSize), p.y + (1/2*yk2));
+        float yk4 = -1 * stepSize * readInterp(vwnd, p.x + stepSize, p.y + yk3);
+        
+        float xk1 = stepSize * readInterp(uwnd, p.x, p.y);
+        float xk2 = stepSize * readInterp(uwnd, p.x + (1/2*xk1), p.y + (1/2*stepSize));
+        float xk3 = stepSize * readInterp(uwnd, p.x + (1/2*xk2), p.y + (1/2*stepSize));
+        float xk4 = stepSize * readInterp(uwnd, p.x + xk3, p.y + stepSize);
+        
+        p.y = p.y + (1/6f)*yk1 + (1/3f)*yk2 + (1/3f)*yk3 + (1/6f)*yk4;
+        p.x = p.x + (1/6f)*xk1 + (1/3f)*xk2 + (1/3f)*xk3 + (1/6f)*xk4;
+        
+        vertex(p.x, p.y);
+        p.age++;
+      } else {
+        particles.set(i, new Particle(random(0, width), random(0, height), (int) random (0, 200)));
+      }
+    }
+    
+    endShape();
+  }
   
   // Reads a raw value 
   float readRaw(Table tab, int x, int y) {
